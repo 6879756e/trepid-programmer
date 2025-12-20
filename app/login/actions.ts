@@ -1,43 +1,62 @@
 'use server'
 
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { cookies, headers } from 'next/headers'
+import { createClient } from '../utils/supabase/server' // Adjust ../.. based on exact depth if needed
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 
 export async function login(formData: FormData) {
+  const supabase = await createClient()
+
   const email = formData.get('email') as string
-  const cookieStore = await cookies()
-  const origin = (await headers()).get('origin')
+  const password = formData.get('password') as string
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options })
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: '', ...options })
-        },
-      },
-    }
-  )
+  if (!email || !password) {
+    return redirect('/error?message=Please enter both email and password')
+  }
 
-  const { error } = await supabase.auth.signInWithOtp({
+  const { error } = await supabase.auth.signInWithPassword({
     email,
+    password,
+  })
+
+  if (error) {
+    // Redirect to the error page with the specific message from Supabase
+    // (e.g., "Invalid login credentials")
+    return redirect(`/error?message=${encodeURIComponent(error.message)}`)
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/')
+}
+
+export async function signup(formData: FormData) {
+  const supabase = await createClient()
+
+  const email = formData.get('email') as string
+  const password = formData.get('password') as string
+
+  if (!email || !password) {
+    return redirect('/error?message=Email and password are required')
+  }
+
+  // FIX: Ensure email and password are NOT inside a 'data' block
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`,
+      // Custom user data (like username) goes inside this data block, 
+      // but NOT the email and password.
+      data: {
+        display_name: 'New User', 
+      },
     },
   })
 
   if (error) {
-    console.error(error)
-    redirect('/error') // Ideally create a simple error page later
+    return redirect(`/error?message=${encodeURIComponent(error.message)}`)
   }
 
-  redirect('/check-email')
+  revalidatePath('/', 'layout')
+  redirect('/verify')
 }
