@@ -12,7 +12,9 @@ export default function MarkdownView({ content }: { content: string }) {
             </pre>
           ),
           code: ({ className, children, ...props }) => {
-            const isBlock = /language-(\w+)/.exec(className || "");
+            const isBlock =
+              /language-(\w+)/.exec(className || "") ||
+              children?.toString().startsWith("block code");
             if (isBlock) {
               return (
                 <code
