@@ -6,15 +6,7 @@ export default async function Home() {
   // 1. Ask Supabase for the posts
   const supabase = await createClient();
 
-  console.log(
-    "user:",
-    supabase.auth.admin,
-    (await supabase.auth.getUser()).data.user?.identities
-  );
-
   const { data: posts } = await supabase.from("posts").select("*");
-
-  console.log("posts:", posts?.length, posts);
 
   return (
     <div className="min-h-screen p-8 sm:p-20 font-[family-name:var(--font-geist-sans)]">

@@ -1,14 +1,20 @@
-import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
+
+import { createClient } from "@/utils/supabase/server";
+import { isAdmin } from "@/utils/supabase/admin";
 import { signout } from "@/app/auth/actions";
 
 export default async function Header() {
   const supabase = await createClient();
 
-  // Check if user is logged in
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  let showCreateButton = false;
+  if (user) {
+    showCreateButton = await isAdmin(supabase, user.id);
+  }
 
   return (
     <header className="w-full border-b border-gray-200 bg-white p-4">
@@ -20,6 +26,14 @@ export default async function Header() {
 
         {/* User Navigation */}
         <nav className="flex items-center gap-4">
+          {showCreateButton && (
+            <Link
+              href="posts/create"
+              className="text-sm font-medium hover:underline"
+            >
+              + New Log
+            </Link>
+          )}
           {user ? (
             // 1. SHOW THIS IF LOGGED IN
             <div className="flex items-center gap-4">
