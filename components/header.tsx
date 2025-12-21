@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
-import { signout } from "../app/auth/actions";
+import { signout } from "@/app/auth/actions";
 
 export default async function Header() {
   const supabase = await createClient();
