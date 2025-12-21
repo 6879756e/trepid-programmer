@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "../utils/supabase/server"; // Adjust ../.. based on exact depth if needed
+import { createClient } from "@/utils/supabase/server"; // Adjust ../.. based on exact depth if needed
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
