@@ -8,7 +8,8 @@ export type FormatType =
   | "h3"
   | "image"
   | "quote"
-  | "list";
+  | "list"
+  | "ordered-list";
 
 export function applyFormat(
   text: string,
@@ -49,15 +50,25 @@ export function applyFormat(
       prefix = "### ";
       break;
 
-    // --- NEW FORMATS ---
     case "quote":
       prefix = "> ";
       break;
     case "list":
-      prefix = "- ";
+    case "ordered-list":
+      if (selectedText.length > 0) {
+        replacement = selectedText
+          .split("\n")
+          .map((line, index) => {
+            if (type === "list") return `- ${line}`;
+            if (type === "ordered-list") return `${index + 1}. ${line}`;
+            return line;
+          })
+          .join("\n");
+      } else {
+        replacement = type === "list" ? "- " : "1. ";
+      }
       break;
     case "image":
-      // Images are unique: they replace the selection with a template
       replacement = `![${
         selectedText || "Image Description"
       }](https://placehold.co/600x400)`;

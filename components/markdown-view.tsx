@@ -2,22 +2,18 @@ import ReactMarkdown from "react-markdown";
 
 export default function MarkdownView({ content }: { content: string }) {
   return (
-    <div className="prose prose-lg prose-gray max-w-none">
+    <div className="prose prose-lg prose-gray max-w-none text-gray-800">
       <ReactMarkdown
         components={{
-          // 1. OVERRIDE THE BLOCK CODE CONTAINER (<pre>)
+          // --- EXISTING CODE BLOCKS (Keep this) ---
           pre: ({ children }) => (
             <pre className="not-prose bg-gray-50 border border-gray-200 rounded-lg p-4 overflow-x-auto text-sm leading-relaxed text-gray-800 shadow-sm mt-6 mb-6">
               {children}
             </pre>
           ),
-          // 2. OVERRIDE THE INLINE CODE (single `backticks`)
           code: ({ className, children, ...props }) => {
-            // Check if this code is inside a block (does it have a language class?)
             const isBlock = /language-(\w+)/.exec(className || "");
-
             if (isBlock) {
-              // If it's a block, just render plain text (the <pre> above handles the box)
               return (
                 <code
                   className={`${className} bg-transparent p-0 text-inherit font-mono`}
@@ -27,8 +23,6 @@ export default function MarkdownView({ content }: { content: string }) {
                 </code>
               );
             }
-
-            // If it's INLINE code (like `const x = 1`), give it the pink/gray style
             return (
               <code
                 className="bg-gray-100 text-pink-600 px-1.5 py-0.5 rounded-md font-mono text-[0.9em] border border-gray-200 font-normal"
@@ -38,6 +32,22 @@ export default function MarkdownView({ content }: { content: string }) {
               </code>
             );
           },
+
+          // --- NEW: EXPLICIT LIST RENDERING ---
+          // 1. Unordered Lists (Bullets)
+          ul: ({ children }) => (
+            <ul className="list-disc pl-6 my-4 space-y-2 marker:text-gray-400">
+              {children}
+            </ul>
+          ),
+          // 2. Ordered Lists (Numbers)
+          ol: ({ children }) => (
+            <ol className="list-decimal pl-6 my-4 space-y-2 marker:text-gray-500">
+              {children}
+            </ol>
+          ),
+          // 3. List Items
+          li: ({ children }) => <li className="pl-1">{children}</li>,
         }}
       >
         {content}

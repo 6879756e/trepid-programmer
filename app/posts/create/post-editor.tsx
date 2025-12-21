@@ -172,9 +172,14 @@ export default function PostEditor() {
               title="Quote"
             />
             <ToolbarButton
-              label="• List"
+              label="• ——"
               onClick={() => handleFormat("list")}
               title="Bullet List"
+            />
+            <ToolbarButton
+              label="1. ——"
+              onClick={() => handleFormat("ordered-list")}
+              title="Numbered List"
             />
             <ToolbarButton
               label="{ }"
