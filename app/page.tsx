@@ -31,26 +31,31 @@ export default async function Home() {
 
         <div className="space-y-4">
           {/* 2. Map through the posts and display them */}
-          {posts?.map((post) => (
-            <div
-              key={post.id}
-              className="border border-gray-200 p-4 rounded-lg hover:bg-gray-50 transition"
-            >
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-lg font-medium">{post.title}</h3>
-                {post.is_public && IS_DEBUG ? (
-                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-bold">
-                    PUBLIC
-                  </span>
-                ) : (
-                  <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-bold">
-                    PRIVATE
-                  </span>
-                )}
+          {posts?.map((post) => {
+            const color = post.is_public ? "green" : "red";
+            const string = post.is_public ? "PUBLIC" : "NOT_PUBLIC";
+
+            return (
+              <div
+                key={post.id}
+                className="border border-gray-200 p-4 rounded-lg hover:bg-gray-50 transition"
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-lg font-medium">{post.title}</h3>
+                  {IS_DEBUG ? (
+                    <span
+                      className={`bg-${color}-100 text-${color}-800 text-xs px-2 py-1 rounded-full font-bold`}
+                    >
+                      {string}
+                    </span>
+                  ) : (
+                    ""
+                  )}
+                </div>
+                <p className="text-gray-600">{post.content}</p>
               </div>
-              <p className="text-gray-600">{post.content}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </main>
     </div>
