@@ -5,20 +5,22 @@ import Link from "next/link";
 
 interface PostPageProps {
   params: Promise<{
-    id: string;
+    slug: string;
   }>;
 }
 
 export default async function PostPage({ params }: PostPageProps) {
   const supabase = await createClient();
 
-  const { id } = await params;
+  const { slug } = await params;
+
+  console.log("slug is", slug);
 
   // 1. Fetch the specific post
   const { data: post, error } = await supabase
     .from("posts")
     .select("*")
-    .eq("id", id)
+    .eq("slug", slug)
     .single(); // .single() is important! It returns one object, not an array.
 
   // 2. Handle 404

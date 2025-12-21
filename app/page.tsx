@@ -11,6 +11,8 @@ export default async function Home() {
     .select("*")
     .order("created_at", { ascending: false });
 
+  console.log("posts", posts);
+
   return (
     <div className="min-h-screen p-8 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="max-w-2xl mx-auto">
@@ -32,7 +34,7 @@ export default async function Home() {
             return (
               // Wrap the whole card in a Link
               <Link
-                href={`/posts/${post.id}`}
+                href={`/posts/${post.slug}`}
                 key={post.id}
                 className="block border border-gray-200 p-6 rounded-lg hover:bg-gray-50 transition group"
               >
