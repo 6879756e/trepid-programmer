@@ -33,7 +33,6 @@ export default function MarkdownView({ content }: { content: string }) {
             );
           },
 
-          // --- NEW: EXPLICIT LIST RENDERING ---
           // 1. Unordered Lists (Bullets)
           ul: ({ children }) => (
             <ul className="list-disc pl-6 my-4 space-y-2 marker:text-gray-400">
@@ -48,6 +47,12 @@ export default function MarkdownView({ content }: { content: string }) {
           ),
           // 3. List Items
           li: ({ children }) => <li className="pl-1">{children}</li>,
+
+          blockquote: ({ children }) => (
+            <blockquote className="border-l-4 border-gray-300 pl-4 text-gray-600 italic my-6">
+              {children}
+            </blockquote>
+          ),
         }}
       >
         {content}
