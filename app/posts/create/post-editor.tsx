@@ -132,20 +132,6 @@ export default function PostEditor() {
 
           {/* Toolbar */}
           <div className="flex flex-wrap gap-1 mb-2 border border-gray-200 bg-gray-50 p-1 rounded-t-md">
-            {/* Text Style */}
-            <ToolbarButton
-              label="B"
-              title="Bold (Cmd+B)"
-              onClick={() => handleFormat("bold")}
-            />
-            <ToolbarButton
-              label="I"
-              onClick={() => handleFormat("italic")}
-              title="Italic (Cmd+I)"
-            />
-
-            {/* <div className="w-px bg-gray-300 mx-1 my-1"></div> */}
-
             {/* Headers */}
             <ToolbarButton
               label="h1"
@@ -163,7 +149,19 @@ export default function PostEditor() {
               title="Small header"
             />
 
-            {/* <div className="w-px bg-gray-300 mx-1 my-1"></div> */}
+            {/* Text Style */}
+            <ToolbarButton
+              label="B"
+              title="Bold (Cmd+B)"
+              onClick={() => handleFormat("bold")}
+            />
+            <ToolbarButton
+              label="I"
+              onClick={() => handleFormat("italic")}
+              title="Italic (Cmd+I)"
+            />
+
+            <div className="w-px bg-gray-300 mx-1 my-1"></div>
 
             {/* Structure */}
             <ToolbarButton
@@ -171,23 +169,27 @@ export default function PostEditor() {
               onClick={() => handleFormat("quote")}
               title="Quote"
             />
-            <ToolbarButton
-              label="• ——"
-              onClick={() => handleFormat("list")}
-              title="Bullet List"
-            />
-            <ToolbarButton
-              label="1. ——"
-              onClick={() => handleFormat("ordered-list")}
-              title="Numbered List"
-            />
+
             <ToolbarButton
               label="{ }"
               onClick={() => handleFormat("code")}
               title="Code Block"
             />
 
-            {/* <div className="w-px bg-gray-300 mx-1 my-1"></div> */}
+            <div className="w-px bg-gray-300 mx-1 my-1"></div>
+
+            <ToolbarButton
+              label="• —"
+              onClick={() => handleFormat("list")}
+              title="Bullet List"
+            />
+            <ToolbarButton
+              label="1. —"
+              onClick={() => handleFormat("ordered-list")}
+              title="Numbered List"
+            />
+
+            <div className="w-px bg-gray-300 mx-1 my-1"></div>
 
             {/* Media */}
             <ToolbarButton
