@@ -31,7 +31,7 @@ export default async function Header() {
               href="posts/create"
               className="text-sm font-medium hover:underline"
             >
-              + New Log
+              + New Post
             </Link>
           )}
           {user ? (
