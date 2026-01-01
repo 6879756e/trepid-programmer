@@ -28,7 +28,7 @@ export default async function Header() {
         <nav className="flex items-center gap-4">
           {showCreateButton && (
             <Link
-              href="posts/create"
+              href="/posts/create"
               className="text-sm font-medium hover:underline"
             >
               + New Post
