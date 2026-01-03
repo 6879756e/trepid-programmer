@@ -11,7 +11,7 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
   // 1. Security Gate: Kick out non-admins immediately
   const canEdit = await isAdmin();
   if (!canEdit) {
-    redirect("/");
+    notFound();
   }
 
   // 2. Fetch the post data to pre-fill the form
