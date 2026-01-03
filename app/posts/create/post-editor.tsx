@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, KeyboardEvent } from "react";
-import { createPost, updatePost } from "@/app/posts/actions";
+import { createPost, updatePost, uploadImage } from "@/app/posts/actions";
 import MarkdownView from "@/components/markdown-view";
 import { applyFormat, FormatType } from "./text-utils";
 
@@ -17,7 +17,60 @@ interface PostEditorProps {
 }
 
 export default function PostEditor({ post }: PostEditorProps) {
-  console.log(`post-editor post.id ${post?.id}`);
+  const [isUploading, setIsUploading] = useState(false);
+  async function handleImageUpload(file: File) {
+    if (!file.type.startsWith("image/")) return;
+
+    setIsUploading(true);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const { url, error } = await uploadImage(formData);
+
+    setIsUploading(false);
+
+    if (error || !url) {
+      alert("Failed to upload image");
+      return;
+    }
+
+    // Insert Markdown at cursor position
+    if (textareaRef.current) {
+      const start = textareaRef.current.selectionStart;
+      const end = textareaRef.current.selectionEnd;
+      const markdown = `![Image](${url})`;
+
+      const newText =
+        content.substring(0, start) + markdown + content.substring(end);
+
+      setContent(newText);
+
+      // Restore focus
+      setTimeout(() => {
+        textareaRef.current?.focus();
+        textareaRef.current?.setSelectionRange(
+          start + markdown.length,
+          start + markdown.length
+        );
+      }, 0);
+    }
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) handleImageUpload(file);
+  }
+
+  function handlePaste(e: React.ClipboardEvent) {
+    const file = e.clipboardData.files[0];
+    if (file) {
+      e.preventDefault();
+      handleImageUpload(file);
+    }
+  }
+
   const [title, setTitle] = useState(post?.title || "");
   const [content, setContent] = useState(post?.content || "");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
@@ -213,6 +266,28 @@ export default function PostEditor({ post }: PostEditorProps) {
               onClick={() => handleFormat("image")}
               title="Insert Image"
             />
+
+            <div className="toolbar...">
+              {/* Hidden File Input for clicking */}
+              <input
+                type="file"
+                id="image-upload"
+                className="hidden"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleImageUpload(file);
+                }}
+              />
+              <label
+                htmlFor="image-upload"
+                className="cursor-pointer hover:bg-gray-200 p-2 rounded"
+                title="Upload Image"
+              >
+                🖼️ Image
+              </label>
+              {/* ... other buttons ... */}
+            </div>
           </div>
 
           <textarea
@@ -224,6 +299,8 @@ export default function PostEditor({ post }: PostEditorProps) {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={handleKeyDown}
+            onDrop={handleDrop}
+            onPaste={handlePaste}
             placeholder="# Header&#10;Write your content here..."
           />
         </div>

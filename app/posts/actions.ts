@@ -73,3 +73,40 @@ export async function updatePost(id: string, formData: FormData) {
   revalidatePath(`/posts/${id}`);
   redirect("/");
 }
+
+export async function uploadImage(formData: FormData) {
+  const supabase = await createClient();
+  const file = formData.get("file") as File;
+
+  if (!file) {
+    return { error: "No file uploaded" };
+  }
+
+  // 1. Use the original filename (Sanitized)
+  // We clean it to ensure the URL is readable and safe (no spaces or weird symbols)
+  const fileName = file.name
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-") // Replace spaces with -
+    .replace(/[^\w.-]/g, ""); // Remove any special characters except . - _
+
+  const filePath = `uploads/${fileName}`;
+
+  // 2. Upload to Supabase Storage
+  const { error: uploadError } = await supabase.storage
+    .from("blog-images")
+    .upload(filePath, file, {});
+
+  if (uploadError) {
+    console.error("Upload error:", uploadError);
+    return { error: "Upload failed" };
+  }
+
+  // 3. Get the Public URL
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("blog-images").getPublicUrl(filePath);
+
+  // Add a cache-busting timestamp so updates show immediately
+  return { url: `${publicUrl}?t=${Date.now()}` };
+}
