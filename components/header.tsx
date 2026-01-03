@@ -13,7 +13,7 @@ export default async function Header() {
 
   let showCreateButton = false;
   if (user) {
-    showCreateButton = await isAdmin(supabase, user.id);
+    showCreateButton = await isAdmin(user?.id);
   }
 
   return (

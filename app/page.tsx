@@ -11,7 +11,7 @@ export default async function Home() {
     .select("*")
     .order("created_at", { ascending: false });
 
-  console.log("posts", posts);
+  // console.log("posts", posts);
 
   return (
     <div className="min-h-screen p-8 sm:p-20 font-[family-name:var(--font-geist-sans)]">

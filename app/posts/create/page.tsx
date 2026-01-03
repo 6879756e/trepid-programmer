@@ -11,7 +11,7 @@ export default async function CreatePostPage() {
 
   if (!user) redirect("/auth/login");
 
-  const isUserAdmin = await isAdmin(supabase, user.id);
+  const isUserAdmin = await isAdmin(user.id);
   if (!isUserAdmin) redirect("/");
 
   return (

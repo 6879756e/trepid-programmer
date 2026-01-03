@@ -1,16 +1,32 @@
 "use client";
 
 import { useState, useRef, KeyboardEvent } from "react";
-import { createPost } from "../actions";
+import { createPost, updatePost } from "@/app/posts/actions";
 import MarkdownView from "@/components/markdown-view";
 import { applyFormat, FormatType } from "./text-utils";
 
-export default function PostEditor() {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [isPreviewMode, setIsPreviewMode] = useState(false);
+// 1. DEFINE THE PROP TYPE
+interface PostEditorProps {
+  post?: {
+    id: string;
+    title: string;
+    content: string;
+    is_public: boolean;
+    slug: string; // Added slug just in case
+  } | null;
+}
 
+export default function PostEditor({ post }: PostEditorProps) {
+  console.log(`post-editor post.id ${post?.id}`);
+  const [title, setTitle] = useState(post?.title || "");
+  const [content, setContent] = useState(post?.content || "");
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const updatePostWithId = post?.id ? updatePost.bind(null, post.id) : () => {};
+
+  const isEditing = !!post;
+  const formAction = isEditing ? updatePostWithId : createPost;
 
   const handleFormat = (type: FormatType) => {
     const textarea = textareaRef.current;
@@ -98,7 +114,7 @@ export default function PostEditor() {
   // --- EDITOR MODE (Writer View) ---
   return (
     <div className="max-w-3xl mx-auto">
-      <form action={createPost} className="flex flex-col gap-6">
+      <form action={formAction} className="flex flex-col gap-6">
         {/* Top Bar: Title & Preview Button */}
         <div className="flex justify-between items-end gap-4">
           <div className="flex-1">

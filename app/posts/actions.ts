@@ -1,9 +1,9 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
+import { isAdmin } from "@/utils/supabase/admin"; // Import helper
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { isAdmin } from "@/utils/supabase/admin"; // Import helper
 
 export async function createPost(formData: FormData) {
   const supabase = await createClient();
@@ -17,7 +17,7 @@ export async function createPost(formData: FormData) {
   }
 
   // 2. NEW: DB-Based Admin Check
-  const isUserAdmin = await isAdmin(supabase, user.id);
+  const isUserAdmin = await isAdmin(user.id);
 
   if (!isUserAdmin) {
     // If they aren't an admin, stop immediately
@@ -42,4 +42,34 @@ export async function createPost(formData: FormData) {
   } else {
     console.log("result is", result);
   }
+}
+
+export async function updatePost(id: string, formData: FormData) {
+  const supabase = await createClient();
+
+  // 1. Get the Hidden ID and other fields
+  const title = formData.get("title") as string;
+  const content = formData.get("content") as string;
+  const is_public = formData.get("is_public") === "on";
+
+  console.log("DEBUG: Update Post ID ->", id, "Type ->", typeof id);
+
+  // 2. Update the row (We usually DON'T update the slug to keep links working)
+  const { error } = await supabase
+    .from("posts")
+    .update({
+      title,
+      content,
+      is_public,
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error updating post:", error);
+    return;
+  }
+
+  revalidatePath("/");
+  revalidatePath(`/posts/${id}`);
+  redirect("/");
 }

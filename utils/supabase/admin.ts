@@ -1,8 +1,18 @@
-import { SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@/utils/supabase/server";
 
-export async function isAdmin(supabase: SupabaseClient, userId: string) {
-  // 1. Query your custom table (Assuming it's named 'profiles')
-  // We explicitly select the 'access_tags' column
+export async function isAdmin(userId?: string) {
+  const supabase = await createClient();
+
+  if (!userId) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    userId = user?.id;
+
+    if (!userId) return false;
+  }
+
   const { data, error } = await supabase
     .from("profiles")
     .select("access_tags")
@@ -14,6 +24,5 @@ export async function isAdmin(supabase: SupabaseClient, userId: string) {
     return false;
   }
 
-  // 3. Check if the array contains 'admin'
-  return data.access_tags.includes("admin");
+  return data?.access_tags.includes("admin");
 }
