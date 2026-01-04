@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/utils/supabase/server";
+import PhotoGallery from "./photo-gallery";
 
 export default async function AboutPage() {
   return (
@@ -81,20 +82,9 @@ export default async function AboutPage() {
 
           {/* Image Placeholder */}
           <div className="md:col-span-1">
-            {/* Replace with your actual image component when ready */}
             {/* Right Column: Image */}
             <div className="md:col-span-1">
-              {/* The Image Container */}
-              <div className="relative aspect-square rotate-2 hover:rotate-0 transition-transform duration-500">
-                <Image
-                  src="https://voteyksuyaasmmyfvmfi.supabase.co/storage/v1/object/public/blog-images/public/me.JPG"
-                  alt="Hyun"
-                  fill // <--- This makes the image fill the container
-                  className="object-cover rounded-lg shadow-md border border-gray-200"
-                  sizes="(max-width: 768px) 100vw, 33vw" // Helps browser pick the right size
-                  priority // <--- Loads this image immediately (good for 'About' pages)
-                />
-              </div>
+              <PhotoGallery />
 
               {/* Connect Links (Keep your existing connect section below) */}
               <div className="mt-10">{/* ... your connect links ... */}</div>
