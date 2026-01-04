@@ -119,7 +119,7 @@ export default function PostEditor({ post }: PostEditorProps) {
           {/* THE NEW CLEAN TOOLBAR */}
           <EditorToolbar
             onFormat={handleFormat}
-            onImageClick={triggerImagePicker} // <--- This triggers the hidden input
+            onImageClick={triggerImagePicker}
           />
 
           <div className="relative">
