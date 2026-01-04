@@ -1,20 +1,17 @@
 export const dynamic = "force-dynamic";
 import { createClient } from "@/utils/supabase/server";
 import { IS_DEBUG } from "@/utils/env";
+import Link from "next/link"; // <--- Import Link
 
 export default async function Home() {
-  // 1. Ask Supabase for the posts
   const supabase = await createClient();
+  // Sort by created_at descending so newest is first
+  const { data: posts } = await supabase
+    .from("posts")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-  console.log(
-    "user:",
-    supabase.auth.admin,
-    (await supabase.auth.getUser()).data.user?.identities
-  );
-
-  const { data: posts } = await supabase.from("posts").select("*");
-
-  console.log("posts:", posts?.length, posts);
+  // console.log("posts", posts);
 
   return (
     <div className="min-h-screen p-8 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -30,30 +27,41 @@ export default async function Home() {
         <h2 className="text-2xl font-semibold mb-4">Latest Logs</h2>
 
         <div className="space-y-4">
-          {/* 2. Map through the posts and display them */}
           {posts?.map((post) => {
             const color = post.is_public ? "green" : "red";
-            const string = post.is_public ? "PUBLIC" : "NOT_PUBLIC";
+            const statusLabel = post.is_public ? "PUBLIC" : "DRAFT";
 
             return (
-              <div
+              // Wrap the whole card in a Link
+              <Link
+                href={`/posts/${post.slug}`}
                 key={post.id}
-                className="border border-gray-200 p-4 rounded-lg hover:bg-gray-50 transition"
+                className="block border border-gray-200 p-6 rounded-lg hover:bg-gray-50 transition group"
               >
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-lg font-medium">{post.title}</h3>
-                  {IS_DEBUG ? (
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-xl font-bold group-hover:text-blue-600 transition-colors">
+                    {post.title}
+                  </h3>
+
+                  {/* Debug Badge */}
+                  {IS_DEBUG && (
                     <span
-                      className={`bg-${color}-100 text-${color}-800 text-xs px-2 py-1 rounded-full font-bold`}
+                      className={`bg-${color}-100 text-${color}-800 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider`}
                     >
-                      {string}
+                      {statusLabel}
                     </span>
-                  ) : (
-                    ""
                   )}
                 </div>
-                <p className="text-gray-600">{post.content}</p>
-              </div>
+
+                {/* Excerpt (Truncated) */}
+                <p className="text-gray-600 line-clamp-3 text-sm">
+                  {post.content}
+                </p>
+
+                <div className="mt-4 text-xs text-gray-400 font-mono">
+                  {new Date(post.created_at).toLocaleDateString()}
+                </div>
+              </Link>
             );
           })}
         </div>
