@@ -5,18 +5,15 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 // 1. DATA STRUCTURE WITH CAPTIONS
+// 2. Find 2 more images and write the description
 const IMAGES = [
   {
     src: "https://voteyksuyaasmmyfvmfi.supabase.co/storage/v1/object/public/blog-images/public/me.JPG",
     caption: "The most flattering image of myself.",
   },
   {
-    src: "https://voteyksuyaasmmyfvmfi.supabase.co/storage/v1/object/public/blog-images/public/me_2.JPG",
-    caption: "Hiking in the Alps. I regret wearing these shoes.",
-  },
-  {
-    src: "https://voteyksuyaasmmyfvmfi.supabase.co/storage/v1/object/public/blog-images/public/me_3.JPG",
-    caption: "3:00 AM debugging session. Coffee #4.",
+    src: "https://voteyksuyaasmmyfvmfi.supabase.co/storage/v1/object/public/blog-images/public/me_2.jpg",
+    caption: "Me with my most favourite nephew in the whole wide world!",
   },
 ];
 
@@ -54,10 +51,10 @@ export default function PhotoGallery() {
         className="relative w-64 h-64 mx-auto md:mx-0 cursor-pointer group perspective-1000"
         onClick={() => setSelectedId(0)}
       >
-        {/* Back Image (Image 3) */}
+        {/* Back Image (Image 3)
         <div className="absolute inset-0 transition-all duration-500 ease-out group-hover:rotate-12 group-hover:translate-x-24 group-hover:scale-105 z-10 opacity-90">
           <GalleryImage src={IMAGES[2].src} alt="Back" />
-        </div>
+        </div> */}
 
         {/* Middle Image (Image 2) */}
         <div className="absolute inset-0 transition-all duration-500 ease-out group-hover:rotate-6 group-hover:translate-x-12 group-hover:scale-105 z-20">
@@ -192,27 +189,6 @@ export default function PhotoGallery() {
                       {IMAGES[selectedId].caption}
                     </p>
                   </div>
-
-                  {/* Close Text Button */}
-                  <button
-                    onClick={() => setSelectedId(null)}
-                    className="text-gray-400 hover:text-black transition"
-                  >
-                    <span className="sr-only">Close</span>
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
                 </div>
               </motion.div>
             </motion.div>
