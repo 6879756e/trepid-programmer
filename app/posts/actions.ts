@@ -166,7 +166,7 @@ export async function logPostView(
     country: headerList.get("x-vercel-ip-country") || "Unknown", // Works on Vercel
     ip_hash: ipHash,
     referrer: cleanReferrer,
-    device_type: isMobile ? "mobile" : "desktop",
+    device_type: isMobile ? userAgent : "desktop",
     scroll_depth_percent: scrollDepthPercent,
     user_id: user?.id || null,
   });
