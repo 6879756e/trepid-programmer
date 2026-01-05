@@ -5,7 +5,6 @@ import { signout } from "@/app/auth/actions";
 
 export default async function Header() {
   const supabase = await createClient();
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -15,69 +14,63 @@ export default async function Header() {
     showCreateButton = await isAdmin(user?.id);
   }
 
-  return (
-    <header className="w-full border-b border-gray-200 bg-white p-4">
-      <div className="max-w-4xl mx-auto flex justify-between items-center">
-        {/* --- LEFT SIDE: Navigation --- */}
-        <div className="flex items-center gap-6">
-          {/* Logo */}
-          <Link href="/" className="font-bold text-xl tracking-tight">
-            Trepid
-          </Link>
+  const navLinkStyle =
+    "text-base font-medium text-gray-500 hover:text-gray-900 transition-colors";
 
-          {/* Site Links (About) */}
+  return (
+    <header className="w-full border-b border-gray-100 bg-white px-6 py-5">
+      <div className="max-w-4xl mx-auto flex justify-between items-center">
+        {/* --- LEFT SIDE: Brand & Site Nav --- */}
+        <div className="flex items-center gap-8">
           <Link
-            href="/about"
-            className="text-sm font-medium text-gray-500 hover:text-black transition-colors"
+            href="/"
+            className="font-serif text-xl font-medium tracking-widest uppercase text-gray-900 select-none"
           >
-            About
+            Trepid Programmer
           </Link>
         </div>
 
-        {/* --- RIGHT SIDE: User Actions --- */}
-        <nav className="flex items-center gap-4">
+        {/* --- RIGHT SIDE: Actions --- */}
+        <nav className="flex items-center gap-6">
           {showCreateButton && (
             <Link
               href="/posts/create"
-              className="text-sm font-medium text-blue-600 hover:text-blue-800 mr-2"
+              className="text-sm font-medium text-blue-600 hover:text-blue-800"
             >
               + New Post
             </Link>
           )}
 
           {user ? (
-            // LOGGED IN
-            <div className="flex items-center gap-4">
-              {/* Hide email on mobile to prevent clogging */}
-              <span className="text-sm text-gray-600 hidden sm:block">
-                {user.email}
-              </span>
+            // LOGGED IN STATE
+            <div className="flex items-center gap-6">
+              <Link href="/auth/account" className={navLinkStyle}>
+                Profile
+              </Link>
+
               <form action={signout}>
-                <button
-                  className="bg-gray-100 px-3 py-2 rounded text-sm hover:bg-gray-200 transition-colors"
-                  type="submit"
-                >
+                <button className={navLinkStyle} type="submit">
                   Sign Out
                 </button>
               </form>
             </div>
           ) : (
-            // LOGGED OUT
-            <div className="flex gap-4 text-sm items-center">
-              <Link
-                href="/auth/login"
-                className="text-gray-600 hover:text-black hover:underline px-1"
-              >
-                Log In
+            // LOGGED OUT STATE
+            <div className="flex items-center gap-6">
+              <Link href="/auth/login" className={navLinkStyle}>
+                Log in
               </Link>
-              <Link
-                href="/auth/signup"
-                className="bg-black text-white px-3 py-1.5 rounded hover:bg-gray-800 transition-colors font-medium"
-              >
-                Sign Up
+
+              {/* Sign Up: Slightly distinct but still minimal */}
+              <Link href="/auth/signup" className={navLinkStyle}>
+                Sign up
               </Link>
             </div>
           )}
+
+          <Link href="/about" className={`${navLinkStyle} relative top-px`}>
+            About
+          </Link>
         </nav>
       </div>
     </header>

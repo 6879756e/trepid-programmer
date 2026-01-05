@@ -1,69 +1,74 @@
-export const dynamic = "force-dynamic";
 import { createClient } from "@/utils/supabase/server";
-import { IS_DEBUG } from "@/utils/env";
-import Link from "next/link"; // <--- Import Link
+import Link from "next/link";
+
+// 1. HELPER: Group posts by Year
+// Returns an object like: { "2025": [post1, post2], "2024": [post3] }
+function groupPostsByYear(posts: any[]) {
+  return posts.reduce((acc, post) => {
+    const year = new Date(post.created_at).getFullYear().toString();
+    if (!acc[year]) {
+      acc[year] = [];
+    }
+    acc[year].push(post);
+    return acc;
+  }, {} as Record<string, any[]>);
+}
+
+// 2. HELPER: Format date to "10 May"
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+  });
+}
 
 export default async function Home() {
   const supabase = await createClient();
-  // Sort by created_at descending so newest is first
   const { data: posts } = await supabase
     .from("posts")
     .select("*")
     .order("created_at", { ascending: false });
 
-  // console.log("posts", posts);
+  const postsByYear = groupPostsByYear(posts || []);
+  // Sort years descending (2025, 2024...)
+  const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
 
   return (
-    <div className="min-h-screen p-8 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="max-w-2xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">The Trepid Programmer</h1>
+    <div className="min-h-screen bg-white p-8 font-[family-name:var(--font-geist-sans)]">
+      <main className="max-w-2xl mx-auto mt-6">
+        {/* Main Page Title */}
+        {/* <h1 className="text-4xl font-serif text-gray-900 mb-16">Blog</h1> */}
 
-        <p className="mb-8 text-gray-600">
-          Hello, my name is Hyun. I have resided on planet Earth for as long as
-          I can remember. My main interests are programming, health, and
-          sociology.
-        </p>
+        <div className="space-y-16">
+          {years.map((year) => (
+            <section key={year}>
+              {/* Year Header */}
+              <h2 className="text-gray-400 text-lg font-medium mb-6 border-b border-gray-100 pb-2">
+                {year}
+              </h2>
 
-        <h2 className="text-2xl font-semibold mb-4">Latest Logs</h2>
-
-        <div className="space-y-4">
-          {posts?.map((post) => {
-            const color = post.is_public ? "green" : "red";
-            const statusLabel = post.is_public ? "PUBLIC" : "DRAFT";
-
-            return (
-              // Wrap the whole card in a Link
-              <Link
-                href={`/posts/${post.slug}`}
-                key={post.id}
-                className="block border border-gray-200 p-6 rounded-lg hover:bg-gray-50 transition group"
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-xl font-bold group-hover:text-blue-600 transition-colors">
-                    {post.title}
-                  </h3>
-
-                  {/* Debug Badge */}
-                  {IS_DEBUG && (
-                    <span
-                      className={`bg-${color}-100 text-${color}-800 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider`}
-                    >
-                      {statusLabel}
+              <div className="flex flex-col">
+                {postsByYear[year].map((post: any) => (
+                  <Link
+                    key={post.id}
+                    href={`/posts/${post.slug}`}
+                    className="group flex items-baseline justify-between py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors -mx-4 px-4 rounded-lg"
+                  >
+                    {/* Title */}
+                    <span className="text-lg text-gray-900 font-serif group-hover:text-black font-medium">
+                      {post.title}
                     </span>
-                  )}
-                </div>
 
-                {/* Excerpt (Truncated) */}
-                <p className="text-gray-600 line-clamp-3 text-sm">
-                  {post.content}
-                </p>
-
-                <div className="mt-4 text-xs text-gray-400 font-mono">
-                  {new Date(post.created_at).toLocaleDateString()}
-                </div>
-              </Link>
-            );
-          })}
+                    {/* Date */}
+                    <span className="text-sm text-gray-400 font-mono whitespace-nowrap ml-8">
+                      {formatDate(post.created_at)}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ))}
         </div>
       </main>
     </div>

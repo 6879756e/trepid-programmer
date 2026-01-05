@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-const config: Config = {
+export default {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -8,10 +8,16 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      // ... your existing colors ...
+      colors: {
+        background: "var(--background)",
+        foreground: "var(--foreground)",
+      },
+      fontFamily: {
+        sans: ["var(--font-geist-sans)"],
+        serif: ["var(--font-lora)"],
+        mono: ["var(--font-geist-mono)"],
+      },
     },
   },
-  // ADD THIS PLUGIN SECTION:
   plugins: [require("@tailwindcss/typography")],
-};
-export default config;
+} satisfies Config;
