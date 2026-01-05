@@ -26,7 +26,15 @@ export default async function Header() {
             href="/"
             className="font-serif text-xl font-medium tracking-widest uppercase text-gray-900 select-none"
           >
-            Trepid Programmer
+            {/* MOBILE */}
+            <span className="text-3xl font-bold tracking-tighter sm:hidden">
+              T
+            </span>
+
+            {/* DESKTOP */}
+            <span className="hidden sm:block text-xl font-medium tracking-widest">
+              Trepid Programmer
+            </span>
           </Link>
         </div>
 
@@ -68,7 +76,7 @@ export default async function Header() {
             </div>
           )}
 
-          <Link href="/about" className={`${navLinkStyle} relative top-px`}>
+          <Link href="/about" className={navLinkStyle}>
             About
           </Link>
         </nav>
