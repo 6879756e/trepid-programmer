@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import MarkdownView from "@/components/markdown-view";
 import Link from "next/link";
 import { isAdmin } from "@/utils/supabase/admin";
+import AnalyticsTracker from "@/components/analytics-tracker";
 
 interface PostPageProps {
   params: Promise<{
@@ -14,8 +15,6 @@ export default async function PostPage({ params }: PostPageProps) {
   const supabase = await createClient();
 
   const { slug } = await params;
-
-  console.log("slug is", slug);
 
   // 1. Fetch the specific post
   const { data: post, error } = await supabase
@@ -37,6 +36,8 @@ export default async function PostPage({ params }: PostPageProps) {
 
   return (
     <div className="min-h-screen bg-white p-8 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+      <AnalyticsTracker slug={slug} />
+
       <main className="max-w-2xl mx-auto">
         {/* Navigation */}
         <div className="flex justify-between items-center mb-8">

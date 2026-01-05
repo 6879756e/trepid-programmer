@@ -1,9 +1,11 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
-import { isAdmin } from "@/utils/supabase/admin"; // Import helper
+import { isAdmin, createAdminClient } from "@/utils/supabase/admin";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
+import crypto from "crypto";
 
 export async function createPost(formData: FormData) {
   const supabase = await createClient();
@@ -109,4 +111,67 @@ export async function uploadImage(formData: FormData) {
 
   // Add a cache-busting timestamp so updates show immediately
   return { url: `${publicUrl}?t=${Date.now()}` };
+}
+
+export async function logPostView(
+  slug: string,
+  durationSeconds: number,
+  scrollDepthPercent: number
+) {
+  if (durationSeconds < 2) return;
+
+  // Reader client
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const headerList = await headers();
+
+  // Writer client
+  const adminSupabase = createAdminClient();
+
+  const ip = headerList.get("x-forwarded-for") || "unknown";
+
+  // 3. Create a "Daily Salted Hash"
+  // This lets you count unique visitors for ONE day, but prevents long-term tracking.
+  // Ideally, use a real secret env var here, but a fallback works for now.
+  const today = new Date().toISOString().slice(0, 10); // "2025-01-05"
+  const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || "simple_secret";
+  const ipHash = crypto
+    .createHash("sha256")
+    .update(ip + today + secret)
+    .digest("hex");
+
+  // 4. Extract Clean Referrer
+  const referer = headerList.get("referer") || "Direct";
+  let cleanReferrer = "Direct";
+  if (referer !== "Direct") {
+    try {
+      const url = new URL(referer);
+      cleanReferrer = url.hostname; // e.g., "t.co" becomes "t.co"
+    } catch (e) {
+      cleanReferrer = referer;
+    }
+  }
+
+  // 5. Detect Device
+  const userAgent = headerList.get("user-agent") || "";
+  const isMobile = /mobile|android|iphone|ipad|ipod/i.test(userAgent);
+
+  // 6. Insert Data
+  const { error } = await adminSupabase.from("post_analytics").insert({
+    slug,
+    duration_seconds: durationSeconds,
+    country: headerList.get("x-vercel-ip-country") || "Unknown", // Works on Vercel
+    ip_hash: ipHash,
+    referrer: cleanReferrer,
+    device_type: isMobile ? "mobile" : "desktop",
+    scroll_depth_percent: scrollDepthPercent,
+    user_id: user?.id || null,
+  });
+
+  if (error) {
+    console.error("Analytics Error:", error);
+  }
 }
